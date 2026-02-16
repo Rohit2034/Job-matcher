@@ -1,0 +1,31 @@
+Job Title: Full Stack Developer (Python + React)
+
+Location: Bangalore
+Experience Required: 4–8 years
+Employment Type: Full-time
+
+Job Description:
+We are hiring a Full Stack Developer with strong experience in Python and React to build end-to-end web applications.
+
+Responsibilities:
+- Design and develop backend services using Python (Django/FastAPI)
+- Build modern frontend applications using React.js
+- Integrate frontend with backend APIs
+- Work with databases such as PostgreSQL
+- Participate in code reviews and system design discussions
+
+Required Skills:
+- Python
+- Django, Flask, or FastAPI
+- React.js
+- JavaScript
+- PostgreSQL
+
+Preferred Skills:
+- Docker
+- AWS or Azure
+- Microservices architecture
+- CI/CD
+- Agile/Scrum
+
+Role: Full Stack Developer
