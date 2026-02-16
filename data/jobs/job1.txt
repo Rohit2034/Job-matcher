@@ -1,0 +1,30 @@
+Job Title: Python Backend Developer
+
+Location: Bangalore
+Experience Required: 3–6 years
+Employment Type: Full-time
+
+Job Description:
+We are looking for a skilled Python Backend Developer to design, develop, and maintain scalable backend systems.
+
+Responsibilities:
+- Develop RESTful APIs using Python and Django or Flask
+- Work with relational databases such as PostgreSQL and MySQL
+- Optimize application performance and scalability
+- Collaborate with frontend and DevOps teams
+- Write clean, maintainable, and testable code
+
+Required Skills:
+- Python
+- Django or Flask
+- REST APIs
+- PostgreSQL
+- Git
+
+Preferred Skills:
+- Docker
+- Redis
+- AWS or Azure
+- CI/CD pipelines
+
+Role: Backend Developer

@@ -1,0 +1,30 @@
+Job Title: React Frontend Developer
+
+Location: Bangalore
+Experience Required: 2–5 years
+Employment Type: Full-time
+
+Job Description:
+We are seeking a React Frontend Developer to build intuitive and high-performance user interfaces for web applications.
+
+Responsibilities:
+- Develop responsive UI components using React.js
+- Integrate REST APIs with frontend applications
+- Optimize applications for speed and scalability
+- Collaborate with UX designers and backend developers
+- Ensure cross-browser compatibility
+
+Required Skills:
+- JavaScript (ES6+)
+- React.js
+- HTML5
+- CSS3
+- REST APIs
+
+Preferred Skills:
+- Redux or Context API
+- TypeScript
+- Material UI or Tailwind CSS
+- Jest or React Testing Library
+
+Role: Frontend Developer

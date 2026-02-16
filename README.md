@@ -1,0 +1,6 @@
+AZURE_ENDPOINT = ""
+AZURE_DEPLOYMENT = ""
+AZURE_API_KEY = ""
+AZURE_API_VERSION = ""
+MONGO_URI=mongodb://localhost:27017
+MONGO_DB=jobmatcher

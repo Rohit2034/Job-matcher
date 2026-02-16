@@ -1,0 +1,31 @@
+Job Title: Software Engineer (Python & React)
+
+Location: Bangalore
+Experience Required: 3–7 years
+Employment Type: Full-time
+
+Job Description:
+We are looking for a Software Engineer with hands-on experience in Python and React to develop scalable web platforms.
+
+Responsibilities:
+- Build backend services using Python
+- Develop frontend interfaces using React.js
+- Write unit and integration tests
+- Debug, troubleshoot, and optimize applications
+- Collaborate with cross-functional teams
+
+Required Skills:
+- Python
+- React.js
+- JavaScript
+- REST APIs
+- SQL
+
+Preferred Skills:
+- FastAPI
+- TypeScript
+- Docker
+- Cloud platforms (AWS/Azure)
+- Git and CI/CD
+
+Role: Software Engineer
