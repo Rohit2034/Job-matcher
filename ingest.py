@@ -42,7 +42,7 @@ def ingest_resumes(path="data/resumes"):
     added = 0
 
     for file in files:
-        if not file.lower().endswith(".pdf"):
+        if not file.lower().endswith((".txt", ".pdf", ".docx")):
             continue
 
         text = extract_text(os.path.join(path, file))
@@ -109,7 +109,3 @@ def ingest_jobs(path="data/jobs"):
 
     print(f"Jobs added: {added}")
 
-
-if __name__ == "__main__":
-    ingest_resumes()
-    ingest_jobs()
