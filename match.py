@@ -138,7 +138,3 @@ def match_job(job_id: str, top_k: int = 5):
         print(f"   Secondary Skills: {r['secondary']}")
         print("-" * 50)
 
-
-
-if __name__ == "__main__":
-    match_job("job3.txt")
