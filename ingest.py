@@ -5,8 +5,9 @@ from embedder import embed
 from skill_extractor import parse_skills
 from text_utils import extract_text
 
-resume_col = client.get_or_create_collection("resumes")
-job_col = client.get_or_create_collection("jobs")
+resume_col = client.get_collection("resumes")
+job_col = client.get_collection("jobs")
+
 
 
 def _extract_job_metadata(text: str) -> dict:
