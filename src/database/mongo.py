@@ -17,4 +17,4 @@ resume_collection.create_index("secondary_skills")
 job_collection.create_index("primary_skills")
 job_collection.create_index("secondary_skills")
 
-print("✅ MongoDB indexes created successfully!")
+print(" MongoDB indexes created successfully!")
