@@ -137,4 +137,3 @@ def match_job(job_id: str, top_k: int = 5):
         print(f"   Primary Skills: {r['primary']}")
         print(f"   Secondary Skills: {r['secondary']}")
         print("-" * 50)
-

@@ -6,7 +6,7 @@ def extract_text(file_path: str) -> str:
 
     if file_path.lower().endswith(".pdf"):
         try:
-            reader = PdfReader(file_path)
+            reader = PdfReader(file_path, strict=False)
             text = " ".join(page.extract_text() for page in reader.pages if page.extract_text())
             return text
         except Exception as e:
