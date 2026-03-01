@@ -1,11 +1,6 @@
-sentence-transformers
-psycopg2-binary
-pgvector
-python-dotenv
-openai
 pypdf
-python-docx
-tqdm
-numpy
+openai
+python-dotenv
+pydantic
 pymongo
-chromadb
+asyncio-throttle
