@@ -192,7 +192,7 @@ async def parse_jd(pdf_path: str):
 
     async with semaphore:
 
-        print(f" Processing: {pdf_path}")
+        print(f"Processing: {pdf_path}")
 
         text = extract_text_from_pdf(pdf_path)
 
@@ -220,14 +220,14 @@ async def parse_jd(pdf_path: str):
         raw_output = response.choices[0].message.content
         parsed = safe_json_load(raw_output)
 
-
-
+        # -----------------------------
+        # Skills Handling
+        # -----------------------------
         required_skills_list = parsed.get("required_skills_with_scores", [])
         good_to_have = parsed.get("good_to_have_skills", [])
 
-        # Convert list → dict safely
         required_skills_dict = {
-            item["skill_name"]: item["score"]
+            item["skill_name"].strip().lower(): int(item["score"])
             for item in required_skills_list
             if isinstance(item, dict)
             and "skill_name" in item
@@ -236,47 +236,60 @@ async def parse_jd(pdf_path: str):
 
         # Primary = score >= 8
         primary_skills = [
-            skill.lower()
-            for skill, score in required_skills_dict.items()
+            skill for skill, score in required_skills_dict.items()
             if score >= 8
         ]
 
         # Secondary = score < 8 + good_to_have
         secondary_skills = [
-            skill.lower()
-            for skill, score in required_skills_dict.items()
+            skill for skill, score in required_skills_dict.items()
             if score < 8
-        ] + [s.lower() for s in good_to_have]
+        ] + [s.strip().lower() for s in good_to_have]
 
         secondary_skills = list(set(secondary_skills) - set(primary_skills))
 
-        # Safe experience conversion
+ 
         try:
-            min_exp = int(parsed.get("minimum_experience_in_years", 0))
+            min_exp_years = int(parsed.get("minimum_experience_in_years", 0))
         except Exception:
-            min_exp = 0
+            min_exp_years = 0
 
+        min_exp_months = min_exp_years * 12  
 
+        location = parsed.get("location", "N/A")
+
+        if isinstance(location, str):
+            if location.strip() == "":
+                location = ["N/A"]
+            else:
+                location = [location.strip()]
+        elif isinstance(location, list):
+            location = [loc.strip() for loc in location if loc.strip()]
+        else:
+            location = ["N/A"]
+
+        # -----------------------------
+        # Final Job Data
+        # -----------------------------
         job_data = {
             "job_id": job_id,
             "job_summary": parsed.get("job_summary", ""),
             "key_responsibilities": parsed.get("key_responsibilities", []),
 
-            "required_skills_with_scores": {
-                k.lower(): v for k, v in required_skills_dict.items()
-            },
+            "required_skills_with_scores": required_skills_dict,
 
             "primary_skills": list(set(primary_skills)),
             "secondary_skills": list(set(secondary_skills)),
 
-            "minimum_experience_in_years": min_exp,
+            "minimum_experience_in_years": min_exp_years,
+            "minimum_experience_in_months": min_exp_months,
+
             "technology": parsed.get("technology", "Others"),
             "category": parsed.get("category", "Others"),
-            "location": parsed.get("location", "N/A"),
+            "location": location,
             "justification": parsed.get("justification", ""),
             "created_at": datetime.utcnow()
         }
-
 
         job_collection.update_one(
             {"job_id": job_id},
