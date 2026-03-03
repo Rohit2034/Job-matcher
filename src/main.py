@@ -102,7 +102,7 @@ def main_menu():
                     if not results:
                         print("No matching jobs found.\n")
                     else:
-                        print(f"\nTop {top_n} Matching Jobs:\n")
+                        print(f"\nTop Matching Jobs:\n")
                         for idx, job in enumerate(results, 1):
                             print(f"{idx}. Job ID: {job.get('job_id')}")
                             print(f"   Category: {job.get('category', 'N/A')}")
