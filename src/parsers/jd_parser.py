@@ -3,9 +3,9 @@ import json
 import asyncio
 from datetime import datetime
 from openai import AsyncAzureOpenAI
-from database.mongo import job_collection
-from parsers.pdf_extractor import extract_text_from_pdf
-from config.settings import (
+from src.database.mongo import job_collection
+from src.parsers.pdf_extractor import extract_text_from_pdf
+from src.config.settings import (
     AZURE_OPENAI_API_KEY,
     AZURE_OPENAI_ENDPOINT,
     AZURE_OPENAI_API_VERSION,
@@ -21,7 +21,7 @@ client = AsyncAzureOpenAI(
 
 semaphore = asyncio.Semaphore(AZURE_CONCURRENCY)
 
-from config.tech_mapping import TECH_CATEGORIES_JSON_STR as technologies_and_categories
+from src.config.tech_mapping import TECH_CATEGORIES_JSON_STR as technologies_and_categories
 
 
 
@@ -298,3 +298,24 @@ async def parse_jd(pdf_path: str):
         )
 
         print(f"Stored/Updated JD: {job_id}")
+
+async def ingest_all_jds(jd_directory: str):
+
+    files = [
+        os.path.join(jd_directory, f)
+        for f in os.listdir(jd_directory)
+        if f.lower().endswith(".pdf")
+    ]
+
+    if not files:
+        print("No JD files found.")
+        return
+
+    await asyncio.gather(*(parse_jd(f) for f in files), return_exceptions=True)
+
+    print("\n JD ingestion completed.\n")
+
+
+if __name__ == "__main__":
+    JD_DIR = "data/input/jd"
+    asyncio.run(ingest_all_jds(JD_DIR))

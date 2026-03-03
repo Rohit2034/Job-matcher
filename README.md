@@ -42,11 +42,27 @@ data/input/jd
 
 ```
 
-3. Run the CLI:
+3. Run the jd_parser:
 
 ```
 
-python src/main.py
+python -m src.parsers.jd_parser
+
+```
+
+4. Run the resume_parser:
+
+```
+
+python -m src.parsers.resume_parser
+
+```
+
+5. Run the CLI:
+
+```
+
+python -m src.main
 
 ```
 
@@ -130,11 +146,9 @@ Matching is implemented using MongoDB aggregation pipelines.
 
 ```
 
-PRIMARY_WEIGHT   = 50
-SECONDARY_WEIGHT = 20
-EXPERIENCE_WEIGHT = 15
-LOCATION_WEIGHT   = 5
-EDUCATION_WEIGHT  = 10
+PRIMARY_WEIGHT   = 70
+SECONDARY_WEIGHT = 30
+
 
 ```
 
@@ -142,9 +156,8 @@ EDUCATION_WEIGHT  = 10
 
 - Primary skill overlap  
 - Secondary skill overlap  
-- Experience match comparison  
-- Location match  
-- Education relevance  
+
+experience acts as a cutoff 
 
 **Final Score = Weighted sum of all scoring components**
 
@@ -176,16 +189,15 @@ pip install -r requirements.txt
 
 ```
 
-python src/main.py
+python -m src.main
 
 ```
 
 ### 4. Choose Menu Options
 
-- Parse Resumes  
-- Parse JDs  
 - Match Job → Resumes  
-- Match Resume → Jobs  
+- Match Resume → Jobs
+- Exit  
 
 ## Tech Stack
 

@@ -1,12 +1,13 @@
+import os
 import uuid
 import json
 import asyncio
 import re
 from datetime import datetime
 from openai import AsyncAzureOpenAI
-from database.mongo import resume_collection
-from parsers.pdf_extractor import extract_text_from_pdf
-from config.settings import (
+from src.database.mongo import resume_collection
+from src.parsers.pdf_extractor import extract_text_from_pdf
+from src.config.settings import (
     AZURE_OPENAI_API_KEY,
     AZURE_OPENAI_ENDPOINT,
     AZURE_OPENAI_API_VERSION,
@@ -14,7 +15,7 @@ from config.settings import (
     AZURE_CONCURRENCY
 )
 
-from config.tech_mapping import TECH_CATEGORIES_MAP as technologies_and_categories
+from src.config.tech_mapping import TECH_CATEGORIES_MAP as technologies_and_categories
 
 client = AsyncAzureOpenAI(
     api_key=AZURE_OPENAI_API_KEY,
@@ -427,3 +428,24 @@ async def parse_resume(pdf_path: str):
         resume_collection.insert_one(resume_data)
 
         print(f"✅ Stored: {resume_data['email']}")
+
+async def ingest_all_jds(resume_directory: str):
+
+    files = [
+        os.path.join(resume_directory, f)
+        for f in os.listdir(resume_directory)
+        if f.lower().endswith(".pdf")
+    ]
+
+    if not files:
+        print("No resume files found.")
+        return
+
+    await asyncio.gather(*(parse_resume(f) for f in files), return_exceptions=True)
+
+    print("\n Resume ingestion completed.\n")
+
+
+if __name__ == "__main__":
+    RESUME_DIR = "data/input/resumes"
+    asyncio.run(ingest_all_jds(RESUME_DIR))

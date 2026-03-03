@@ -1,5 +1,5 @@
 from pymongo import MongoClient, ASCENDING
-from config.settings import MONGO_URI
+from src.config.settings import MONGO_URI
 
 client = MongoClient(MONGO_URI)
 db = client["Job_Matcher"]

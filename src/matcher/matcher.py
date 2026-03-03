@@ -1,4 +1,4 @@
-from database.mongo import resume_collection, job_collection
+from src.database.mongo import resume_collection, job_collection
 
 PRIMARY_WEIGHT = 70
 SECONDARY_WEIGHT = 30
