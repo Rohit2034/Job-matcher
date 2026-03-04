@@ -2,24 +2,16 @@ import os
 import json
 import asyncio
 from datetime import datetime
-from openai import AsyncAzureOpenAI
+from src.config.azure_con import AzureOpenAIConnection
 from src.database.mongo import job_collection
 from src.parsers.pdf_extractor import extract_text_from_pdf
 from src.config.settings import (
-    AZURE_OPENAI_API_KEY,
-    AZURE_OPENAI_ENDPOINT,
-    AZURE_OPENAI_API_VERSION,
-    AZURE_OPENAI_DEPLOYMENT,
-    AZURE_CONCURRENCY
+    AZURE_OPENAI_DEPLOYMENT
 )
 
-client = AsyncAzureOpenAI(
-    api_key=AZURE_OPENAI_API_KEY,
-    azure_endpoint=AZURE_OPENAI_ENDPOINT,
-    api_version=AZURE_OPENAI_API_VERSION
-)
-
-semaphore = asyncio.Semaphore(AZURE_CONCURRENCY)
+azure_connection = AzureOpenAIConnection()
+client = azure_connection.get_client()
+semaphore = azure_connection.get_semaphore()
 
 from src.config.tech_mapping import TECH_CATEGORIES_JSON_STR as technologies_and_categories
 

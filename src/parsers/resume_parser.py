@@ -4,27 +4,18 @@ import json
 import asyncio
 import re
 from datetime import datetime
-from openai import AsyncAzureOpenAI
+from src.config.azure_con import AzureOpenAIConnection
 from src.database.mongo import resume_collection
 from src.parsers.pdf_extractor import extract_text_from_pdf
 from src.config.settings import (
-    AZURE_OPENAI_API_KEY,
-    AZURE_OPENAI_ENDPOINT,
-    AZURE_OPENAI_API_VERSION,
-    AZURE_OPENAI_DEPLOYMENT,
-    AZURE_CONCURRENCY
+    AZURE_OPENAI_DEPLOYMENT
 )
 
 from src.config.tech_mapping import TECH_CATEGORIES_MAP as technologies_and_categories
 
-client = AsyncAzureOpenAI(
-    api_key=AZURE_OPENAI_API_KEY,
-    azure_endpoint=AZURE_OPENAI_ENDPOINT,
-    api_version=AZURE_OPENAI_API_VERSION
-)
-
-# Controls concurrency for N resumes
-semaphore = asyncio.Semaphore(AZURE_CONCURRENCY)
+azure_connection = AzureOpenAIConnection()
+client = azure_connection.get_client()
+semaphore = azure_connection.get_semaphore()
 
 def clean_json_response(text: str) -> str:
     text = text.strip()
