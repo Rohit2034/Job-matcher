@@ -2,6 +2,7 @@ import os
 import asyncio
 from parsers.resume_parser import parse_resume
 from parsers.jd_parser import parse_jd
+from parsers.normalization import normalization
 from matcher.matcher import match_job_to_resumes, match_resume_to_jobs
 from database.mongo import resume_collection,job_collection
 
@@ -23,6 +24,11 @@ async def parse_all_resumes():
     await asyncio.gather(*(parse_resume(f) for f in files),return_exceptions=True)
     print("All resumes parsed successfully.\n")
     
+    # Auto-run normalization after parsing
+    auto_normalize = input("Run skill normalization now? (y/n): ").strip().lower()
+    if auto_normalize == 'y':
+        await normalization()
+    
 
 async def parse_all_jds():
     files = [
@@ -37,6 +43,11 @@ async def parse_all_jds():
 
     await asyncio.gather(*(parse_jd(f) for f in files),return_exceptions=True)
     print("All JDs parsed successfully.\n")
+    
+    # Auto-run normalization after parsing
+    auto_normalize = input("Run skill normalization now? (y/n): ").strip().lower()
+    if auto_normalize == 'y':
+        await normalization()
 
 
 def main_menu():
@@ -47,7 +58,8 @@ def main_menu():
             print("2. Parse JDs")
             print("3. Match Resume → Top JDs")
             print("4. Match Job → Top Resumes")
-            print("5. Exit")
+            print("5. Normalize Skills")
+            print("6. Exit")
 
             choice = input("Enter choice: ").strip()
 
@@ -160,11 +172,17 @@ def main_menu():
                     print(f"Error during Job → Resume matching: {e}")
 
             elif choice == "5":
+                try:
+                    asyncio.run(normalization())
+                except Exception as e:
+                    print(f"Error during skill normalization: {e}")
+
+            elif choice == "6":
                 print("Exiting system. Goodbye!")
                 break
 
             else:
-                print("Invalid choice. Please select 1-5.\n")
+                print("Invalid choice. Please select 1-6.\n")
 
         except KeyboardInterrupt:
             print("\nProgram interrupted by user. Exiting safely.")

@@ -1,0 +1,111 @@
+2026-03-04 12:54:37 - normalization - INFO - Starting skill normalization process.
+2026-03-04 12:54:37 - normalization - ERROR - Error during normalization process: unhashable type: 'list'
+2026-03-04 13:48:24 - normalization - INFO - Starting skill normalization process.
+2026-03-04 13:48:24 - normalization - ERROR - Error during normalization process: unhashable type: 'list'
+2026-03-04 13:49:21 - normalization - INFO - Starting skill normalization process.
+2026-03-04 13:49:21 - normalization - ERROR - Error during normalization process: unhashable type: 'list'
+2026-03-04 13:50:19 - normalization - INFO - Starting skill normalization process.
+2026-03-04 13:50:19 - normalization - INFO - Fetching employees and jobs from MongoDB...
+2026-03-04 13:50:19 - normalization - ERROR - Error during normalization process: unhashable type: 'list'
+2026-03-04 13:50:19 - normalization - ERROR - Traceback: Traceback (most recent call last):
+  File "C:\Users\303370\Desktop\Job-matcher\src\parsers\normalization.py", line 322, in normalization
+    employees, jobs = await asyncio.gather(
+                            ~~~~~~~~~~~~~~^
+        resume_collection.find().to_list(length=None),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        job_collection.find().to_list(length=None)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\asyncio\tasks.py", line 883, in gather
+    if arg not in arg_to_fut:
+       ^^^^^^^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'list'
+
+2026-03-04 13:50:28 - normalization - INFO - Starting skill normalization process.
+2026-03-04 13:50:28 - normalization - INFO - Fetching employees and jobs from MongoDB...
+2026-03-04 13:50:28 - normalization - ERROR - Error during normalization process: unhashable type: 'list'
+2026-03-04 13:50:28 - normalization - ERROR - Traceback: Traceback (most recent call last):
+  File "C:\Users\303370\Desktop\Job-matcher\src\parsers\normalization.py", line 322, in normalization
+    employees, jobs = await asyncio.gather(
+                            ~~~~~~~~~~~~~~^
+        resume_collection.find().to_list(length=None),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        job_collection.find().to_list(length=None)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\asyncio\tasks.py", line 883, in gather
+    if arg not in arg_to_fut:
+       ^^^^^^^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'list'
+
+2026-03-04 13:52:33 - normalization - INFO - Starting skill normalization process.
+2026-03-04 13:52:33 - normalization - INFO - Fetching employees and jobs from MongoDB...
+2026-03-04 13:52:33 - normalization - INFO - length of employees_collection: 23.
+2026-03-04 13:52:33 - normalization - INFO - length of jobs_collection: 20.
+2026-03-04 13:52:33 - normalization - INFO - Extracting skills from employees and jobs...
+2026-03-04 13:52:33 - normalization - ERROR - Error during normalization process: 'str' object has no attribute 'get'
+2026-03-04 13:52:33 - normalization - ERROR - Traceback: Traceback (most recent call last):
+  File "C:\Users\303370\Desktop\Job-matcher\src\parsers\normalization.py", line 338, in normalization
+    skills = extract_skills(employees, jobs, skill_map)
+  File "C:\Users\303370\Desktop\Job-matcher\src\parsers\normalization.py", line 87, in extract_skills
+    skill_name = skill_obj.get("skill_name")
+                 ^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+2026-03-04 13:55:55 - normalization - INFO - Starting skill normalization process.
+2026-03-04 13:55:55 - normalization - INFO - Fetching employees and jobs from MongoDB...
+2026-03-04 13:55:55 - normalization - INFO - length of employees_collection: 23.
+2026-03-04 13:55:55 - normalization - INFO - length of jobs_collection: 20.
+2026-03-04 13:55:55 - normalization - INFO - Extracting skills from employees and jobs...
+2026-03-04 13:55:55 - normalization - INFO - length of skills to normalize: 92.
+2026-03-04 13:55:55 - normalization - INFO - Total batches to process: 1. Batch size: 800.
+2026-03-04 13:55:55 - normalization - INFO - Processing batch 1/1 with 92 skills.
+2026-03-04 13:55:55 - normalization - INFO - Batch: 1. Sending request to Azure OpenAI API.
+2026-03-04 13:55:59 - normalization - INFO - Batch 1 processed and saved successfully.
+2026-03-04 13:55:59 - normalization - INFO - All batches processed. Final output saved to normalized_skills.json.
+2026-03-04 13:55:59 - normalization - INFO - Applying normalized skills back to MongoDB...
+2026-03-04 13:56:00 - normalization - ERROR - Unexpected error while updating normalized skills in employee colection: object BulkWriteResult can't be used in 'await' expression
+2026-03-04 13:56:00 - normalization - ERROR - Unexpected error while updating normalized skills in job colection: object BulkWriteResult can't be used in 'await' expression
+2026-03-04 13:56:00 - normalization - INFO - Time taken to normalize and update: 5.01 seconds
+2026-03-04 13:56:26 - normalization - INFO - Starting skill normalization process.
+2026-03-04 13:56:26 - normalization - INFO - Fetching employees and jobs from MongoDB...
+2026-03-04 13:56:26 - normalization - INFO - length of employees_collection: 23.
+2026-03-04 13:56:26 - normalization - INFO - length of jobs_collection: 20.
+2026-03-04 13:56:26 - normalization - INFO - Extracting skills from employees and jobs...
+2026-03-04 13:56:26 - normalization - INFO - No new skills where found. So skipping normalization.
+2026-03-04 13:56:26 - normalization - INFO - Applying replacement with existing skill map...
+2026-03-04 13:56:26 - normalization - ERROR - Unexpected error while updating normalized skills in employee colection: object BulkWriteResult can't be used in 'await' expression
+2026-03-04 13:56:26 - normalization - ERROR - Unexpected error while updating normalized skills in job colection: object BulkWriteResult can't be used in 'await' expression
+2026-03-04 13:56:26 - normalization - INFO - Time taken to normalize and update: 0.02 seconds
+2026-03-04 13:57:51 - normalization - INFO - Starting skill normalization process.
+2026-03-04 13:57:51 - normalization - INFO - Fetching employees and jobs from MongoDB...
+2026-03-04 13:57:51 - normalization - INFO - length of employees_collection: 23.
+2026-03-04 13:57:51 - normalization - INFO - length of jobs_collection: 20.
+2026-03-04 13:57:51 - normalization - INFO - Extracting skills from employees and jobs...
+2026-03-04 13:57:51 - normalization - INFO - No new skills where found. So skipping normalization.
+2026-03-04 13:57:51 - normalization - INFO - Applying replacement with existing skill map...
+2026-03-04 13:57:51 - normalization - INFO - Employee skills replacement complete: 21 updated, 23 matched
+2026-03-04 13:57:51 - normalization - INFO - Job skills replacement complete: 17 updated, 20 matched
+2026-03-04 13:57:51 - normalization - INFO - Time taken to normalize and update: 0.03 seconds
+2026-03-04 14:30:06 - normalization - INFO - Starting skill normalization process.
+2026-03-04 14:30:06 - normalization - INFO - Fetching employees and jobs from MongoDB...
+2026-03-04 14:30:06 - normalization - INFO - length of employees_collection: 23.
+2026-03-04 14:30:06 - normalization - INFO - length of jobs_collection: 20.
+2026-03-04 14:30:06 - normalization - INFO - Extracting skills from employees and jobs...
+2026-03-04 14:30:06 - normalization - INFO - No new skills where found. So skipping normalization.
+2026-03-04 14:30:06 - normalization - INFO - Applying replacement with existing skill map...
+2026-03-04 14:30:06 - normalization - INFO - Employee skills replacement complete: 21 updated, 23 matched
+2026-03-04 14:30:06 - normalization - INFO - Job skills replacement complete: 17 updated, 20 matched
+2026-03-04 14:30:06 - normalization - INFO - Time taken to normalize and update: 0.04 seconds
+2026-03-04 14:37:03 - normalization - INFO - Starting skill normalization process.
+2026-03-04 14:37:03 - normalization - INFO - Fetching employees and jobs from MongoDB...
+2026-03-04 14:37:03 - normalization - INFO - length of employees_collection: 23.
+2026-03-04 14:37:03 - normalization - INFO - length of jobs_collection: 20.
+2026-03-04 14:37:03 - normalization - INFO - Extracting skills from employees and jobs...
+2026-03-04 14:37:03 - normalization - INFO - No new skills where found. So skipping normalization.
+2026-03-04 14:37:03 - normalization - INFO - Applying replacement with existing skill map...
+2026-03-04 14:37:04 - normalization - INFO - Employee skills replacement complete: 22 updated, 23 matched
+2026-03-04 14:37:04 - normalization - INFO - Job skills replacement complete: 17 updated, 20 matched
+2026-03-04 14:37:04 - normalization - INFO - Time taken to normalize and update: 0.04 seconds

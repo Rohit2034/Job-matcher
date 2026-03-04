@@ -173,7 +173,7 @@ Rules:
    - TypeScript
    - PostgreSQL
 4. Abbreviations like SQL, UI → uppercase.
-5. If none → [].
+5. If none → [].        
 
 ------------------------------------------------------------
 SECONDARY SKILLS:
@@ -292,14 +292,6 @@ NOW PROCESS THE RESUME ABOVE.
                 """
 
 
-# -----------------------------
-# Normalize skill text
-# -----------------------------
-def normalize_skill(skill: str) -> str:
-    skill = (skill or "").lower()
-    skill = re.sub(r"[^a-z0-9\s]", " ", skill)
-    skill = re.sub(r"\s+", " ", skill)
-    return skill.strip()
 import re
 
 def normalize_location(location: str) -> str:
@@ -385,13 +377,13 @@ async def parse_resume(pdf_path: str):
             "email": extracted_email,
 
             "primary_skills": [
-                normalize_skill(s)
+                s.strip() if isinstance(s, str) else s
                 for s in parsed.get("Primary_Skills", [])
                 if isinstance(s, str)
             ],
 
             "secondary_skills": [
-                normalize_skill(s)
+                s.strip() if isinstance(s, str) else s
                 for s in parsed.get("Secondary_Skills", [])
                 if isinstance(s, str)
             ],
