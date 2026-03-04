@@ -10,9 +10,8 @@ from src.parsers.pdf_extractor import extract_text_from_pdf
 from src.config.settings import (
     AZURE_OPENAI_DEPLOYMENT
 )
-
 from src.config.tech_mapping import TECH_CATEGORIES_MAP as technologies_and_categories
-
+from src.parsers.skill_extractor import run_normalization
 azure_connection = AzureOpenAIConnection()
 client = azure_connection.get_client()
 semaphore = azure_connection.get_semaphore()
@@ -420,23 +419,93 @@ async def parse_resume(pdf_path: str):
 
         print(f"✅ Stored: {resume_data['email']}")
 
-async def ingest_all_jds(resume_directory: str):
-
+async def ingest_all_resumes(resume_directory: str):
     files = [
         os.path.join(resume_directory, f)
         for f in os.listdir(resume_directory)
         if f.lower().endswith(".pdf")
     ]
-
     if not files:
         print("No resume files found.")
         return
-
-    await asyncio.gather(*(parse_resume(f) for f in files), return_exceptions=True)
-
+    employees = []
+    async def parse_and_collect(pdf_path):
+        async with semaphore:
+            try:
+                text = extract_text_from_pdf(pdf_path)
+                extracted_email = extract_email(text)
+                response = await client.chat.completions.create(
+                    model=AZURE_OPENAI_DEPLOYMENT,
+                    messages=[
+                        {"role": "system", "content": "You are a senior ATS resume parser. Return ONLY valid JSON."},
+                        {"role": "user", "content": build_prompt(text)}
+                    ],
+                    temperature=0,
+                    response_format={"type": "json_object"}
+                )
+                raw_content = response.choices[0].message.content
+                cleaned = clean_json_response(raw_content)
+                parsed = json.loads(cleaned)
+            except Exception as e:
+                print(f"❌ Parsing failed for {pdf_path}: {e}")
+                return
+            mentioned_years = float(parsed.get("Experience_Mentioned_In_Resume", 0) or 0)
+            mentioned_months = int(mentioned_years * 12)
+            experience_details = parsed.get("Experience", [])
+            calculated_months = 0
+            for exp in experience_details:
+                if isinstance(exp, dict):
+                    months = exp.get("Experience_In_Months", 0)
+                    try:
+                        calculated_months += int(months)
+                    except:
+                        pass
+            total_experience_months = max(mentioned_months, calculated_months)
+            total_experience_years = round(total_experience_months / 12, 1)
+            resume_data = {
+                "candidate_id": str(uuid.uuid4()),
+                "name": (parsed.get("Employee_Name") or "").strip(),
+                "email": extracted_email,
+                "primary_skills": [normalize_skill(s) for s in parsed.get("Primary_Skills", []) if isinstance(s, str)],
+                "secondary_skills": [normalize_skill(s) for s in parsed.get("Secondary_Skills", []) if isinstance(s, str)],
+                "location": [normalize_location(loc) for loc in parsed.get("Location", []) if isinstance(loc, str)],
+                "total_experience_months": total_experience_months,
+                "total_experience_years": total_experience_years,
+                "education": parsed.get("Education", []),
+                "experience_details": experience_details,
+                "technology": parsed.get("Technology", "Others"),
+                "category": parsed.get("Category", "Others"),
+                "justification": parsed.get("Justification", ""),
+                "profile_summary": parsed.get("Profile_Summary", ""),
+                "certifications": parsed.get("Certifications", []),
+            }
+            if not resume_data["email"]:
+                print(f"⚠ Skipped (no email): {pdf_path}")
+                return
+            if resume_collection.find_one({"email": resume_data["email"]}):
+                print(f"⚠ Duplicate skipped: {resume_data['email']}")
+                return
+            employees.append(resume_data)
+    await asyncio.gather(*(parse_and_collect(f) for f in files), return_exceptions=True)
+    # Normalize skills before storing
+    employees_normalized, _ = await run_normalization(employees, [])
+    # Filter duplicates in batch
+    seen_emails = set()
+    for resume_data in employees_normalized:
+        email = resume_data.get("email")
+        if not email or email in seen_emails:
+            continue
+        seen_emails.add(email)
+        # Upsert to avoid duplicate key error
+        resume_collection.update_one(
+            {"email": email},
+            {"$set": resume_data},
+            upsert=True
+        )
+        print(f"✅ Stored/Updated: {email}")
     print("\n Resume ingestion completed.\n")
 
 
 if __name__ == "__main__":
     RESUME_DIR = "data/input/resumes"
-    asyncio.run(ingest_all_jds(RESUME_DIR))
+    asyncio.run(ingest_all_resumes(RESUME_DIR))

@@ -8,6 +8,7 @@ from src.parsers.pdf_extractor import extract_text_from_pdf
 from src.config.settings import (
     AZURE_OPENAI_DEPLOYMENT
 )
+from src.parsers.skill_extractor import run_normalization
 
 azure_connection = AzureOpenAIConnection()
 client = azure_connection.get_client()
@@ -292,19 +293,84 @@ async def parse_jd(pdf_path: str):
         print(f"Stored/Updated JD: {job_id}")
 
 async def ingest_all_jds(jd_directory: str):
-
     files = [
         os.path.join(jd_directory, f)
         for f in os.listdir(jd_directory)
         if f.lower().endswith(".pdf")
     ]
-
     if not files:
         print("No JD files found.")
         return
-
-    await asyncio.gather(*(parse_jd(f) for f in files), return_exceptions=True)
-
+    jobs = []
+    async def parse_and_collect(pdf_path):
+        async with semaphore:
+            print(f"Processing: {pdf_path}")
+            text = extract_text_from_pdf(pdf_path)
+            if not text or not text.strip():
+                print("⚠ Empty JD detected.")
+                return
+            job_id = os.path.splitext(os.path.basename(pdf_path))[0]
+            response = await client.chat.completions.create(
+                model=AZURE_OPENAI_DEPLOYMENT,
+                messages=[
+                    {"role": "system", "content": "You are a precise enterprise ATS job parser."},
+                    {"role": "user", "content": build_prompt(text)}
+                ],
+                temperature=0
+            )
+            raw_output = response.choices[0].message.content
+            parsed = safe_json_load(raw_output)
+            required_skills_list = parsed.get("required_skills_with_scores", [])
+            good_to_have = parsed.get("good_to_have_skills", [])
+            required_skills_dict = {
+                item["skill_name"].strip().lower(): int(item["score"])
+                for item in required_skills_list
+                if isinstance(item, dict) and "skill_name" in item and "score" in item
+            }
+            primary_skills = [skill for skill, score in required_skills_dict.items() if score >= 8]
+            secondary_skills = [skill for skill, score in required_skills_dict.items() if score < 8] + [s.strip().lower() for s in good_to_have]
+            secondary_skills = list(set(secondary_skills) - set(primary_skills))
+            try:
+                min_exp_years = int(parsed.get("minimum_experience_in_years", 0))
+            except Exception:
+                min_exp_years = 0
+            min_exp_months = min_exp_years * 12
+            location = parsed.get("location", "N/A")
+            if isinstance(location, str):
+                if location.strip() == "":
+                    location = ["N/A"]
+                else:
+                    location = [location.strip()]
+            elif isinstance(location, list):
+                location = [loc.strip() for loc in location if loc.strip()]
+            else:
+                location = ["N/A"]
+            job_data = {
+                "job_id": job_id,
+                "job_summary": parsed.get("job_summary", ""),
+                "key_responsibilities": parsed.get("key_responsibilities", []),
+                "required_skills_with_scores": required_skills_dict,
+                "primary_skills": list(set(primary_skills)),
+                "secondary_skills": list(set(secondary_skills)),
+                "minimum_experience_in_years": min_exp_years,
+                "minimum_experience_in_months": min_exp_months,
+                "technology": parsed.get("technology", "Others"),
+                "category": parsed.get("category", "Others"),
+                "location": location,
+                "justification": parsed.get("justification", ""),
+                "created_at": datetime.utcnow()
+            }
+            jobs.append(job_data)
+    await asyncio.gather(*(parse_and_collect(f) for f in files), return_exceptions=True)
+    # Normalize skills before storing
+    _, jobs_normalized = await run_normalization([], jobs)
+    for job_data in jobs_normalized:
+        job_collection.update_one(
+            {"job_id": job_data["job_id"]},
+            {"$set": job_data},
+            upsert=True
+        )
+        print(f"Stored/Updated JD: {job_data['job_id']}")
     print("\n JD ingestion completed.\n")
 
 
