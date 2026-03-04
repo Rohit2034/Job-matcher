@@ -1,14 +1,13 @@
 import json
 import os
 import re
-import asyncio
 from collections import Counter
 from typing import Dict, List, Tuple, Optional
 from src.config.azure_con import AzureOpenAIConnection
+from src.database.mongo import kb_collection
 
 
 class SkillNormalizer:
-    NORMALIZED_SKILLS_FILE = "normalized_skills.json"
     SIMILARITY_THRESHOLD = 0.4
     CANDIDATE_LIMIT = 20
     # Shared client and semaphore
@@ -19,29 +18,20 @@ class SkillNormalizer:
     def __init__(self):
         pass
 
-
-# ==========================================================
-# LOAD / SAVE KB
-# ==========================================================
-
-
     def load_skill_map(self) -> Dict[str, str]:
-        if os.path.exists(self.NORMALIZED_SKILLS_FILE):
-            with open(self.NORMALIZED_SKILLS_FILE, "r") as f:
-                return json.load(f)
+        kb_doc = kb_collection.find_one({"_id": "skill_map"})
+        if kb_doc and "map" in kb_doc:
+            return kb_doc["map"]
         return {}
 
 
 
     def save_skill_map(self, skill_map: Dict[str, str]) -> None:
-        with open(self.NORMALIZED_SKILLS_FILE, "w") as f:
-            json.dump(skill_map, f, indent=4)
-
-
-# ==========================================================
-# TOKENIZATION + SIMILARITY (NO EMBEDDINGS)
-# ==========================================================
-
+        kb_collection.update_one(
+            {"_id": "skill_map"},
+            {"$set": {"map": skill_map}},
+            upsert=True
+        )
 
     @staticmethod
     def tokenize(skill: str) -> set:
@@ -82,18 +72,23 @@ class SkillNormalizer:
                 temperature=temperature
             )
             raw = response.choices[0].message.content
+            if not raw or not raw.strip():
+                print("⚠ Empty response from LLM. Skipping.")
+                return None
             try:
                 return json.loads(raw)
             except Exception:
                 raw = raw.strip()
                 start = raw.find("{")
                 end = raw.rfind("}") + 1
-                return json.loads(raw[start:end])
-
-
-# ==========================================================
-# SKILL → KB MAPPER
-# ==========================================================
+                if start == -1 or end <= start:
+                    print(f"⚠ Malformed response from LLM. Raw output:\n{raw}\nSkipping.")
+                    return None
+                try:
+                    return json.loads(raw[start:end])
+                except Exception:
+                    print(f"⚠ Failed to parse JSON from LLM. Raw output:\n{raw}\nSkipping.")
+                    return None
 
 
     async def map_skill_to_kb(self, skill: str, skill_map: Dict[str, str]) -> Optional[Tuple[str, bool]]:
@@ -129,11 +124,6 @@ Return JSON:
         return canonical, is_new
 
 
-# ==========================================================
-# SKILL EXTRACTION
-# ==========================================================
-
-
     @staticmethod
     def extract_all_skills(employees: List[dict], jobs: List[dict], skill_map: Dict[str, str]) -> List[str]:
         skill_counts = Counter()
@@ -149,11 +139,6 @@ Return JSON:
         new_skills = [skill for skill in skill_counts.keys() if skill not in skill_map]
         new_skills.sort(key=lambda x: -skill_counts[x])
         return new_skills
-
-
-# ==========================================================
-# MAIN NORMALIZATION ENGINE
-# ==========================================================
 
 
     async def normalize_skills(self, employees: List[dict], jobs: List[dict]):
@@ -175,11 +160,6 @@ Return JSON:
         return skill_map
 
 
-# ==========================================================
-# APPLY NORMALIZED SKILLS BACK TO DATA
-# ==========================================================
-
-
     @staticmethod
     def apply_normalization_to_documents(documents: List[dict], skill_map: Dict[str, str]) -> List[dict]:
         def to_lower(s):
@@ -195,11 +175,6 @@ Return JSON:
                     new_required[canonical] = score
                 doc["required_skills_with_scores"] = new_required
         return documents
-
-
-# ==========================================================
-# ENTRY POINT
-# ==========================================================
 
 
 async def run_normalization(employees, jobs):
