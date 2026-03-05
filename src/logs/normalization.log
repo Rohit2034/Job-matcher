@@ -109,3 +109,18 @@ AttributeError: 'str' object has no attribute 'get'
 2026-03-04 14:37:04 - normalization - INFO - Employee skills replacement complete: 22 updated, 23 matched
 2026-03-04 14:37:04 - normalization - INFO - Job skills replacement complete: 17 updated, 20 matched
 2026-03-04 14:37:04 - normalization - INFO - Time taken to normalize and update: 0.04 seconds
+2026-03-04 14:46:34 - normalization - INFO - Starting skill normalization process.
+2026-03-04 14:46:34 - normalization - INFO - Fetching employees and jobs from MongoDB...
+2026-03-04 14:46:34 - normalization - INFO - length of employees_collection: 24.
+2026-03-04 14:46:34 - normalization - INFO - length of jobs_collection: 20.
+2026-03-04 14:46:34 - normalization - INFO - Extracting skills from employees and jobs...
+2026-03-04 14:46:34 - normalization - INFO - length of skills to normalize: 1.
+2026-03-04 14:46:34 - normalization - INFO - Total batches to process: 1. Batch size: 800.
+2026-03-04 14:46:34 - normalization - INFO - Processing batch 1/1 with 1 skills.
+2026-03-04 14:46:34 - normalization - INFO - Batch: 1. Sending request to Azure OpenAI API.
+2026-03-04 14:46:38 - normalization - INFO - Batch 1 processed and saved successfully.
+2026-03-04 14:46:38 - normalization - INFO - All batches processed. Final output saved to normalized_skills.json.
+2026-03-04 14:46:38 - normalization - INFO - Applying normalized skills back to MongoDB...
+2026-03-04 14:46:38 - normalization - INFO - Employee skills replacement complete: 22 updated, 24 matched
+2026-03-04 14:46:38 - normalization - INFO - Job skills replacement complete: 17 updated, 20 matched
+2026-03-04 14:46:38 - normalization - INFO - Time taken to normalize and update: 4.93 seconds
